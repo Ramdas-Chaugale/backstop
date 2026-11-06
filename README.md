@@ -1,5 +1,10 @@
 # backstop
 
+[![evals](https://github.com/Ramdas-Chaugale/backstop/actions/workflows/evals.yml/badge.svg)](https://github.com/Ramdas-Chaugale/backstop/actions/workflows/evals.yml)
+[![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![cases](https://img.shields.io/badge/eval%20cases-20%20passing-1b6b4a)](evals/cases.yaml)
+[![No API key](https://img.shields.io/badge/API%20key-not%20required-1b6b4a)](#about-the-cassettes)
+
 Guardrails and an evaluation harness for a tool calling agent, with the whole
 suite running in continuous integration on every push.
 
