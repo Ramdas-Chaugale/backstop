@@ -16,6 +16,28 @@ mean_turns_to_resolution     1.53
 Those numbers come from `python -m evals.run_evals`, which needs no API key and
 no network.
 
+```mermaid
+flowchart LR
+    U([customer turn]) --> T{turn rules}
+    T -->|escalate| H([hand to a human])
+    T -->|allow| M[model]
+    M -->|answers| R([reply])
+    M -->|asks for a tool| G{tool rules}
+    G -->|block| X[refused<br/>reason returned to the model]
+    G -->|confirm| C[ask the customer first]
+    G -->|allow| TL[tool runs]
+    TL --> M
+    X --> M
+    C --> R
+
+    style G fill:#1b6b4a,stroke:#1b6b4a,color:#ffffff
+    style T fill:#1b6b4a,stroke:#1b6b4a,color:#ffffff
+    style TL fill:#5b8def,stroke:#5b8def,color:#ffffff
+```
+
+The two green diamonds are the whole point. Nothing reaches `tool runs` without
+passing one of them, and neither of them asks the model for permission.
+
 ---
 
 ## What it is
