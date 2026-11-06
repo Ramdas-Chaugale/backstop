@@ -1,0 +1,24 @@
+name: evals
+
+# Every push and every pull request. No API key, no secrets, no network.
+# The whole suite replays from the cassettes committed in evals/cassettes,
+# so it costs nothing and gives the same answer every time.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: pip install -r requirements.txt
+
+      - name: Run the evaluation suite against the baseline
+        run: python -m evals.run_evals

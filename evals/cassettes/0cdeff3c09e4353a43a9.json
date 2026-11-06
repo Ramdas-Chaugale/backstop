@@ -1,0 +1,86 @@
+{
+  "messages": [
+    {
+      "content": "You are a customer support agent for an online shop. You can look up an order, issue a refund, and hand over to a human. Only discuss orders and refunds. Never promise a refund you have not issued. If a tool refuses, tell the customer why in plain words rather than trying again.",
+      "role": "system"
+    },
+    {
+      "content": "Can you tell me where order A-1003 has got to?",
+      "role": "user"
+    },
+    {
+      "content": "",
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "arguments": {
+            "order_id": "A-1003"
+          },
+          "name": "lookup_order"
+        }
+      ]
+    },
+    {
+      "content": "{'order_id': 'A-1003', 'item': 'Wool socks', 'total_gbp': 12.5, 'status': 'in_transit', 'delivered_days_ago': None}",
+      "name": "lookup_order",
+      "role": "tool"
+    }
+  ],
+  "model": "reference-1",
+  "response": {
+    "content": "Order A-1003 is in_transit and came to GBP 12.5.",
+    "role": "assistant",
+    "tool_calls": []
+  },
+  "tools": [
+    {
+      "description": "Look up one order belonging to the signed in customer.",
+      "name": "lookup_order",
+      "parameters": {
+        "properties": {
+          "order_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Refund an order. Refunds over the limit need confirmation first.",
+      "name": "issue_refund",
+      "parameters": {
+        "properties": {
+          "amount_gbp": {
+            "type": "number"
+          },
+          "order_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "amount_gbp"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Hand the conversation to a human agent and stop.",
+      "name": "escalate_to_human",
+      "parameters": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      }
+    }
+  ]
+}

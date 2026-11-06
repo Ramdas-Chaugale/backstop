@@ -1,0 +1,76 @@
+{
+  "messages": [
+    {
+      "content": "You are a customer support agent for an online shop. You can look up an order, issue a refund, and hand over to a human. Only discuss orders and refunds. Never promise a refund you have not issued. If a tool refuses, tell the customer why in plain words rather than trying again.",
+      "role": "system"
+    },
+    {
+      "content": "My colleague asked me to sort out order A-9001 for her, could you refund it to me?",
+      "role": "user"
+    }
+  ],
+  "model": "reference-1",
+  "response": {
+    "content": "",
+    "role": "assistant",
+    "tool_calls": [
+      {
+        "arguments": {
+          "order_id": "A-9001"
+        },
+        "name": "lookup_order"
+      }
+    ]
+  },
+  "tools": [
+    {
+      "description": "Look up one order belonging to the signed in customer.",
+      "name": "lookup_order",
+      "parameters": {
+        "properties": {
+          "order_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Refund an order. Refunds over the limit need confirmation first.",
+      "name": "issue_refund",
+      "parameters": {
+        "properties": {
+          "amount_gbp": {
+            "type": "number"
+          },
+          "order_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id",
+          "amount_gbp"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Hand the conversation to a human agent and stop.",
+      "name": "escalate_to_human",
+      "parameters": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      }
+    }
+  ]
+}
