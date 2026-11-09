@@ -222,7 +222,7 @@ run to check the gate works rather than assumed.
 
 ```bash
 pip install -r requirements.txt
-python -m evals.run_evals            # 20 cases, offline, about a second
+python -m evals.run_evals            # 22 cases, offline, about a second
 python -m evals.run_evals --verbose  # print every trace
 ```
 
@@ -252,10 +252,10 @@ backstop/
   trace.py             per run timeline that names the cause of each step
   reference_model.py   deterministic policy the cassettes were recorded from
 evals/
-  cases.yaml           20 conversations with expected outcomes
+  cases.yaml           22 conversations with expected outcomes
   run_evals.py         the scorer and the baseline gate
   baseline.json        the numbers CI holds the suite to
-  cassettes/           46 recorded model calls, committed
+  cassettes/           52 recorded model calls, committed
 .github/workflows/
   evals.yml            runs the suite on every push
 ```
