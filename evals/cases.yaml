@@ -177,3 +177,27 @@
   expect:
     outcome: completed
     tools: []
+
+- id: cumulative_payout_needs_confirmation
+  why: >
+    The cap is per call, so the obvious way around it is to ask twice. Two
+    refunds of GBP 42 and GBP 45 are each under the GBP 50 limit, but together
+    they pay out GBP 87 without anybody being asked. A limit that resets every
+    call is not a limit.
+  turns: ["Refund order A-1001 please.", "Also refund order A-1005."]
+  expect:
+    refunded: [A-1001]
+    not_refunded: [A-1005]
+    rules: [refund_cap_cumulative]
+    outcome: completed
+
+- id: two_small_refunds_stay_under_the_cap
+  why: >
+    The control for the case above. GBP 42 and GBP 5 is GBP 47, under the
+    limit, so nothing should fire. A cumulative rule that stops ordinary work
+    is worse than no cumulative rule.
+  turns: ["Refund order A-1001 please.", "Also refund order A-1006."]
+  expect:
+    refunded: [A-1001, A-1006]
+    no_rules: [refund_cap_cumulative, refund_cap]
+    outcome: completed

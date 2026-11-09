@@ -21,6 +21,13 @@ ORDERS: dict[str, dict] = {
                "status": "in_transit", "delivered_days_ago": None},
     "A-1004": {"customer_id": "cust-1", "item": "Desk lamp", "total_gbp": 75.00,
                "status": "delivered", "delivered_days_ago": 10},
+    # Two more under-cap orders. Individually they pass the cap without being
+    # asked about, which is the point: the interesting question is what happens
+    # when somebody asks for both.
+    "A-1005": {"customer_id": "cust-1", "item": "Office chair", "total_gbp": 45.00,
+               "status": "delivered", "delivered_days_ago": 6},
+    "A-1006": {"customer_id": "cust-1", "item": "Mug", "total_gbp": 5.00,
+               "status": "delivered", "delivered_days_ago": 2},
     "A-9001": {"customer_id": "cust-2", "item": "Headphones", "total_gbp": 89.00,
                "status": "delivered", "delivered_days_ago": 5},
 }
@@ -40,6 +47,7 @@ class ShopState:
     customer_id: str = "cust-1"
     orders: dict = field(default_factory=lambda: ORDERS)
     refunded_orders: set = field(default_factory=set)
+    refunded_total_gbp: float = 0.0
     refund_confirmed_for: str | None = None
     pending_confirm_order: str | None = None
     off_topic_turns: int = 0
@@ -52,6 +60,7 @@ class ShopState:
             "customer_id": self.customer_id,
             "orders": self.orders,
             "refunded_orders": self.refunded_orders,
+            "refunded_total_gbp": self.refunded_total_gbp,
             "refund_confirmed_for": self.refund_confirmed_for,
             "pending_confirm_order": self.pending_confirm_order,
             "off_topic_turns": self.off_topic_turns,
@@ -107,6 +116,7 @@ def issue_refund(args: dict, state: ShopState) -> dict:
             f"GBP {order['total_gbp']:.2f}"
         )
     state.refunded_orders.add(order_id)
+    state.refunded_total_gbp = round(state.refunded_total_gbp + amount, 2)
     return {"order_id": order_id, "refunded_gbp": amount, "status": "refunded"}
 
 

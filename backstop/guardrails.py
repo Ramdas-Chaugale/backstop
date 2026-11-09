@@ -56,18 +56,39 @@ REFUND_LIMIT_GBP = 50.0
 
 def _refund_cap(tool: str, args: dict, state: dict) -> Decision:
     """No refund above the limit without an explicit confirmation in this
-    conversation. The model is not trusted to remember it asked."""
+    conversation, counting what has already been paid out.
+
+    The cumulative half was added after the evaluation suite caught the first
+    version letting GBP 87 out of the door across two calls, each of which was
+    under the limit on its own. A limit that resets every call is not a limit,
+    it is a speed bump, and the way around it is to ask twice.
+    """
     amount = float(args.get("amount_gbp") or 0)
-    if amount <= REFUND_LIMIT_GBP:
+    order_id = args.get("order_id")
+
+    # A confirmation is granted for one order and spent when it is used.
+    if state.get("refund_confirmed_for") == order_id:
         return ALLOWED
-    if state.get("refund_confirmed_for") == args.get("order_id"):
-        return ALLOWED
-    return Decision(
-        Verdict.CONFIRM,
-        "refund_cap",
-        f"refund of GBP {amount:.2f} is over the GBP {REFUND_LIMIT_GBP:.2f} limit "
-        f"and has not been confirmed for order {args.get('order_id')}",
-    )
+
+    if amount > REFUND_LIMIT_GBP:
+        return Decision(
+            Verdict.CONFIRM,
+            "refund_cap",
+            f"refund of GBP {amount:.2f} is over the GBP {REFUND_LIMIT_GBP:.2f} limit "
+            f"and has not been confirmed for order {order_id}",
+        )
+
+    running = round(float(state.get("refunded_total_gbp") or 0.0) + amount, 2)
+    if running > REFUND_LIMIT_GBP:
+        return Decision(
+            Verdict.CONFIRM,
+            "refund_cap_cumulative",
+            f"this refund would take the total paid out in this conversation to "
+            f"GBP {running:.2f}, over the GBP {REFUND_LIMIT_GBP:.2f} limit, "
+            f"for order {order_id}",
+        )
+
+    return ALLOWED
 
 
 def _refund_once(tool: str, args: dict, state: dict) -> Decision:
