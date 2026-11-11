@@ -11,9 +11,9 @@ a failing evaluation can be read back to the exact rule that fired.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable
 
 
 class Verdict(str, Enum):

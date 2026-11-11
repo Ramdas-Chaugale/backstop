@@ -6,3 +6,6 @@ venv/
 # Traces are written on every run. The interesting ones get pasted into an
 # issue, they do not belong in the history.
 evals/traces/
+
+# notebook scratch
+.ipynb_checkpoints/

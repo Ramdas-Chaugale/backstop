@@ -2,20 +2,20 @@
 
 [![evals](https://github.com/Ramdas-Chaugale/backstop/actions/workflows/evals.yml/badge.svg)](https://github.com/Ramdas-Chaugale/backstop/actions/workflows/evals.yml)
 [![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![cases](https://img.shields.io/badge/eval%20cases-22%20passing-1b6b4a)](evals/cases.yaml)
+[![cases](https://img.shields.io/badge/eval%20cases-23%20passing-1b6b4a)](evals/cases.yaml)
 [![No API key](https://img.shields.io/badge/API%20key-not%20required-1b6b4a)](#about-the-cassettes)
 
 Guardrails and an evaluation harness for a tool calling agent, with the whole
 suite running in continuous integration on every push.
 
 ```
-cases                        22
-passed                       22
+cases                        23
+passed                       23
 task_success_rate            1.0
 guardrail_violation_rate     0.0
 escalation_precision         1.0
 escalation_recall            1.0
-mean_turns_to_resolution     1.59
+mean_turns_to_resolution     1.67
 ```
 
 Those numbers come from `python -m evals.run_evals`, which needs no API key and
@@ -45,6 +45,18 @@ passing one of them, and neither of them asks the model for permission.
 
 ---
 
+## Start here: the notebook
+
+**[notebooks/01_the_journey.ipynb](notebooks/01_the_journey.ipynb)** runs the
+agent through the injection case, the cumulative cap and an escalation, prints
+the trace at each step, and ends with an experiment this README used to only
+assert: **remove each guardrail in turn and measure what breaks.**
+
+It calls the code rather than repeating it. Every cell imports from `backstop/`
+and `evals/`, and GitHub renders it with the output already in it.
+
+---
+
 ## What it is
 
 A customer support agent for a shop. It can look up an order, issue a refund,
@@ -58,7 +70,7 @@ model's answer after the money has moved is a log entry, not a guardrail. Every
 rule in `backstop/guardrails.py` sits between the model deciding to call a tool
 and the tool running, and it can allow, block, require confirmation, or escalate.
 
-**An evaluation suite with adversarial cases.** Twenty two scripted conversations
+**An evaluation suite with adversarial cases.** Twenty three scripted conversations
 with a known correct outcome, including ones written to break the rules: a
 refund over the limit, an order belonging to somebody else, a message claiming
 to be an administrator, an amount sent as text instead of a number.
@@ -175,6 +187,30 @@ A cumulative rule that blocks ordinary work is worse than no cumulative rule,
 so the suite holds both ends: GBP 42 then GBP 45 stops, GBP 42 then GBP 5 does
 not.
 
+**A guardrail nobody had tested.** The ablation in the notebook removes each
+rule and re-runs the suite. `repeated_failure` came back **22 of 22, success
+1.000**: removing it broke nothing, because no case exercised it.
+
+The trace said why. Every turn opened with a successful `lookup_order`, and the
+agent reset the failure counter on any successful tool, so the count reached one
+and never two. The rule could not reach its threshold whatever the customer did.
+
+Looking something up does not mean the agent is unstuck. Read-only tools no
+longer reset the counter, and `repeated_failure_escalates` is now a case. With
+it, removing the rule costs a case like every other rule does.
+
+| guardrail removed | cases passing | task success |
+|---|---:|---:|
+| nothing | 23 of 23 | 1.000 |
+| `order_ownership` | 19 of 23 | 0.826 |
+| `refund_cap` | 18 of 23 | 0.783 |
+| `refund_once` | 22 of 23 | 0.957 |
+| `off_topic` | 22 of 23 | 0.957 |
+| `repeated_failure` | 22 of 23 | 0.957 |
+
+Every rule costs something when it is removed. That is now a measurement rather
+than a claim.
+
 The third failure was narrower. `refund_outside_return_window` phrases the
 request as "I want my money back" rather than "refund", and the model's intent
 matching looked for one keyword.
@@ -222,7 +258,7 @@ run to check the gate works rather than assumed.
 
 ```bash
 pip install -r requirements.txt
-python -m evals.run_evals            # 22 cases, offline, about a second
+python -m evals.run_evals            # 23 cases, offline, about a second
 python -m evals.run_evals --verbose  # print every trace
 ```
 
@@ -252,10 +288,10 @@ backstop/
   trace.py             per run timeline that names the cause of each step
   reference_model.py   deterministic policy the cassettes were recorded from
 evals/
-  cases.yaml           22 conversations with expected outcomes
+  cases.yaml           23 conversations with expected outcomes
   run_evals.py         the scorer and the baseline gate
   baseline.json        the numbers CI holds the suite to
-  cassettes/           52 recorded model calls, committed
+  cassettes/           55 recorded model calls, committed
 .github/workflows/
   evals.yml            runs the suite on every push
 ```

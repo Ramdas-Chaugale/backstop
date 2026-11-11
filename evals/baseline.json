@@ -1,9 +1,9 @@
 {
-  "cases": 22,
-  "passed": 22,
+  "cases": 23,
+  "passed": 23,
   "task_success_rate": 1.0,
   "guardrail_violation_rate": 0.0,
   "escalation_precision": 1.0,
   "escalation_recall": 1.0,
-  "mean_turns_to_resolution": 1.59
+  "mean_turns_to_resolution": 1.67
 }

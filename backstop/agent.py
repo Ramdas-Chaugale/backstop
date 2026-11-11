@@ -38,6 +38,13 @@ ON_TOPIC = {
 AFFIRMATIVE = {"yes", "yeah", "yep", "ok", "okay", "sure", "confirm", "confirmed",
                "proceed", "correct"}
 
+# Tools that only read. A successful lookup does not mean the agent is unstuck,
+# so it must not reset the failure counter. Found by the ablation in
+# notebooks/01_the_journey.ipynb: removing repeated_failure broke no case,
+# because a lookup at the start of every turn kept resetting the count to zero
+# and the rule could never reach its threshold.
+READ_ONLY = {"lookup_order"}
+
 MAX_STEPS_PER_TURN = 4
 
 
@@ -149,7 +156,8 @@ class Agent:
 
                     try:
                         result = REGISTRY[name](args, state)
-                        state.consecutive_tool_failures = 0
+                        if name not in READ_ONLY:
+                            state.consecutive_tool_failures = 0
                         if name == "issue_refund":
                             state.refund_confirmed_for = None
                         trace.add("tool", name=name, result=result)

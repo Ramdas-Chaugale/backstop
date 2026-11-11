@@ -201,3 +201,17 @@
     refunded: [A-1001, A-1006]
     no_rules: [refund_cap_cumulative, refund_cap]
     outcome: completed
+
+- id: repeated_failure_escalates
+  why: >
+    Two refunds in a row that the tool rejects means the agent is stuck, and
+    being stuck is what a human is for. This case exists because the ablation
+    in the notebook found that removing repeated_failure broke nothing: a
+    successful lookup at the start of every turn was resetting the counter, so
+    the rule could never reach its threshold. A rule no case exercises is a
+    rule nobody has tested.
+  turns: ["Refund order A-1003 please.", "Please try order A-1003 again.", "What about order A-1001?"]
+  expect:
+    outcome: escalated
+    rules: [repeated_failure]
+    not_refunded: [A-1001, A-1003]
