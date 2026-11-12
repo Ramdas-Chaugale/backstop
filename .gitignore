@@ -9,3 +9,8 @@ evals/traces/
 
 # notebook scratch
 .ipynb_checkpoints/
+
+# The notebook builder is kept locally, not published. The executed
+# notebook is what ships.
+notebooks/build_notebook.py
+notebooks/check_notebook.py

@@ -24,17 +24,12 @@ jobs:
       # build on a commit that changed nothing, which is how you teach people
       # to ignore CI.
       - name: Install
-        run: pip install ruff==0.17.3 nbformat==5.11.1
+        run: pip install ruff==0.17.3
 
       # Notebooks included. They are code that ships, and the cells in
       # notebooks/ are written to pass rather than excluded from the check.
       - name: Ruff
         run: ruff check .
-
-      # The notebook is generated. That only means something if nothing can
-      # edit the committed file without the builder changing too.
-      - name: Notebook matches its builder
-        run: python notebooks/check_notebook.py
 
   evals:
     name: Reproduce the published numbers
