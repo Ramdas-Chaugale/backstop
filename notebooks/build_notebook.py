@@ -405,12 +405,20 @@ numbers anyone actually running agents watches.
 """),
 ]
 
-nb = nbf.v4.new_notebook(cells=cells)
-nb.metadata = {
-    "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
-    "language_info": {"name": "python"},
-}
-with open(OUT, "w", encoding="utf-8") as f:
-    nbf.write(nb, f)
-print(f"wrote {os.path.basename(OUT)}  {len(cells)} cells "
-      f"({sum(1 for c in cells if c.cell_type == 'code')} code)")
+def build() -> nbf.NotebookNode:
+    """The notebook, in memory. check_notebook.py compares this against the
+    committed file so the two cannot drift apart."""
+    nb = nbf.v4.new_notebook(cells=cells)
+    nb.metadata = {
+        "kernelspec": {"display_name": "Python 3", "language": "python",
+                       "name": "python3"},
+        "language_info": {"name": "python"},
+    }
+    return nb
+
+
+if __name__ == "__main__":
+    with open(OUT, "w", encoding="utf-8") as f:
+        nbf.write(build(), f)
+    print(f"wrote {os.path.basename(OUT)}  {len(cells)} cells "
+          f"({sum(1 for c in cells if c.cell_type == 'code')} code)")

@@ -1,0 +1,20 @@
+[project]
+name = "backstop"
+version = "0.1.0"
+description = "Guardrails and an evaluation harness for a tool calling agent"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+# Notebooks are linted too. They are code that ships, and the cells in
+# notebooks/ are written to pass rather than excluded from the check.
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "E501",  # line length is handled by the formatter
+    "B905",
+]

@@ -13,10 +13,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class Verdict(str, Enum):
+class Verdict(StrEnum):
     ALLOW = "allow"
     BLOCK = "block"
     CONFIRM = "confirm"      # needs an explicit yes from the customer
